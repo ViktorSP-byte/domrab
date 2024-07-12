@@ -7,18 +7,19 @@ def log(filename: Any = None) -> Callable:
         @wraps(func)
         def inner(*args, **kwargs) -> Any:
             try:
-                if filename:
-                    result = func(*args, **kwargs)
-                    with open(filename, "a", encoding='utf-8') as file:
-                        file.write('\nmy_function ok')
-                else:
-                    print("\nmy_function ok")
-
+                func(*args, **kwargs)
             except Exception as e:
-                with open(filename, "a", encoding='utf-8') as file:
-                    file.write(f'\nmy_function error: {e} Inputs: {args}, {kwargs}')
-                raise Exception(f'Ошибка: {e}')
-            return result
+                f'\n{func.__name__}: {e}. Inputs: {args}, {kwargs}'
+                raise e
+            else:
+                output_massage = f'\n{func.__name__} ok'
+                return output_massage
+            finally:
+                if filename:
+                    with open(filename, "a", encoding="utf-8") as file:
+                        file.write(f'\n{func.__name__} ok')
+                else:
+                    print(f'\n{func.__name__} ok')
         return inner
     return decorator
 
@@ -27,4 +28,4 @@ def log(filename: Any = None) -> Callable:
 def my_function(x, y):
     return x + y
 
-print(my_function(-6, 3))
+print(my_function(1, 2))
